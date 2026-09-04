@@ -695,6 +695,28 @@
             <span id="openweather-opacity-val">80%</span>
         </div>
         <input id="slider-openweather" type="range" class="modern-range" min="0" max="100" value="80">
+        <!-- Temperature color legend -->
+        <div style="margin-top:7px;">
+            <div style="height:10px;border-radius:5px;background:linear-gradient(to right,
+                #1a0066,
+                #0000ff,
+                #00aaff,
+                #00ffcc,
+                #00ff44,
+                #aaff00,
+                #ffff00,
+                #ffaa00,
+                #ff4400,
+                #cc0000
+            );border:1px solid rgba(255,255,255,0.15);"></div>
+            <div style="display:flex;justify-content:space-between;font-size:8.5px;font-family:'Space Mono',monospace;color:#94a3b8;margin-top:3px;">
+                <span>-40°C</span>
+                <span>-10°C</span>
+                <span>10°C</span>
+                <span>25°C</span>
+                <span>40°C+</span>
+            </div>
+        </div>
     </div>
 
     <div class="menu-option switch-container" style="margin-top: 8px;">
@@ -1786,7 +1808,10 @@
             minzoom: 0,
             maxzoom: 19,
             paint: {
-                'raster-opacity': 0.8
+                'raster-opacity': 0.85,
+                'raster-saturation': 0.6,
+                'raster-contrast': 0.3,
+                'raster-fade-duration': 0
             }
         };
 
