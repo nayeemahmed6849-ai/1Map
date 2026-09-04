@@ -563,6 +563,7 @@
     <div id="windy-container">
         <div id="windy"></div>
     </div>
+    <div id="ow-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:3;display:none;pointer-events:none;clip-path:circle(closest-side at 50% 50%);border-radius:50%;overflow:hidden;"></div>
     <div class="mapboxgl-canary" style="visibility: hidden;"></div><div class="mapboxgl-canvas-container mapboxgl-interactive mapboxgl-touch-drag-pan mapboxgl-touch-zoom-rotate"><canvas class="mapboxgl-canvas" tabindex="0" aria-label="Map" role="region" width="1290" height="2796" style="width: 430px; height: 932px;"></canvas></div><div class="mapboxgl-control-container"><div class="mapboxgl-ctrl-top-left"><div class="mapboxgl-ctrl mapboxgl-ctrl-group"><button class="mapboxgl-ctrl-zoom-in" type="button" aria-label="Zoom in" aria-disabled="false"><span class="mapboxgl-ctrl-icon" aria-hidden="true" title="Zoom in"></span></button><button class="mapboxgl-ctrl-zoom-out" type="button" aria-label="Zoom out" aria-disabled="false"><span class="mapboxgl-ctrl-icon" aria-hidden="true" title="Zoom out"></span></button><button class="mapboxgl-ctrl-compass" type="button" aria-label="Reset bearing to north"><span class="mapboxgl-ctrl-icon" aria-hidden="true" title="Reset bearing to north" style="transform: rotate(-40.843deg);"></span></button></div><div class="mapboxgl-ctrl mapboxgl-ctrl-group"><button class="mapboxgl-ctrl-geolocate" type="button" aria-label="Find my location" aria-pressed="false"><span class="mapboxgl-ctrl-icon" aria-hidden="true" title="Find my location"></span></button></div></div><div class="mapboxgl-ctrl-top-right"><div class="mapboxgl-ctrl-geocoder mapboxgl-ctrl ai-style-change-1" style="margin-top: 3px;"><svg class="mapboxgl-ctrl-geocoder--icon mapboxgl-ctrl-geocoder--icon-search" viewBox="0 0 18 18" xml:space="preserve" width="18" height="18"><path d="M7.4 2.5c-2.7 0-4.9 2.2-4.9 4.9s2.2 4.9 4.9 4.9c1 0 1.8-.2 2.5-.8l3.7 3.7c.2.2.4.3.8.3.7 0 1.1-.4 1.1-1.1 0-.3-.1-.5-.3-.8L11.4 10c.4-.8.8-1.6.8-2.5.1-2.8-2.1-5-4.8-5zm0 1.6c1.8 0 3.2 1.4 3.2 3.2s-1.4 3.2-3.2 3.2-3.3-1.3-3.3-3.1 1.4-3.3 3.3-3.3z"></path></svg><input type="text" class="mapboxgl-ctrl-geocoder--input" placeholder="Search places..." aria-label="Search places..."><div class="suggestions-wrapper"><ul class="suggestions" style="display: none;"></ul></div><div class="mapboxgl-ctrl-geocoder--pin-right"><button aria-label="Clear" class="mapboxgl-ctrl-geocoder--button"><svg class="mapboxgl-ctrl-geocoder--icon mapboxgl-ctrl-geocoder--icon-close" viewBox="0 0 18 18" xml:space="preserve" width="18" height="18"><path d="M3.8 2.5c-.6 0-1.3.7-1.3 1.3 0 .3.2.7.5.8L7.2 9 3 13.2c-.3.3-.5.7-.5 1 0 .6.7 1.3 1.3 1.3.3 0 .7-.2 1-.5L9 10.8l4.2 4.2c.2.3.7.3 1 .3.6 0 1.3-.7 1.3-1.3 0-.3-.2-.7-.3-1l-4.4-4L15 4.6c.3-.2.5-.5.5-.8 0-.7-.7-1.3-1.3-1.3-.3 0-.7.2-1 .3L9 7.1 4.8 2.8c-.3-.1-.7-.3-1-.3z"></path></svg></button><svg class="mapboxgl-ctrl-geocoder--icon mapboxgl-ctrl-geocoder--icon-loading" viewBox="0 0 18 18" xml:space="preserve" width="18" height="18"><path fill="#333" d="M4.4 4.4l.8.8c2.1-2.1 5.5-2.1 7.6 0l.8-.8c-2.5-2.5-6.7-2.5-9.2 0z"></path><path opacity=".1" d="M12.8 12.9c-2.1 2.1-5.5 2.1-7.6 0-2.1-2.1-2.1-5.5 0-7.7l-.8-.8c-2.5 2.5-2.5 6.7 0 9.2s6.6 2.5 9.2 0 2.5-6.6 0-9.2l-.8.8c2.2 2.1 2.2 5.6 0 7.7z"></path></svg></div></div></div><div class="mapboxgl-ctrl-bottom-left"><div class="mapboxgl-ctrl" style="display: block;"><a class="mapboxgl-ctrl-logo" target="_blank" rel="noopener nofollow" href="https://www.mapbox.com/" aria-label="Mapbox logo"></a></div></div><div class="mapboxgl-ctrl-bottom-right"><div class="mapboxgl-ctrl mapboxgl-ctrl-attrib mapboxgl-compact"><button class="mapboxgl-ctrl-attrib-button" type="button"><span class="mapboxgl-ctrl-icon" aria-hidden="true" title="Toggle attribution"></span></button><div class="mapboxgl-ctrl-attrib-inner"><a href="https://www.mapbox.com/about/maps" target="_blank" title="Mapbox" aria-label="Mapbox">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright/" target="_blank" title="OpenStreetMap" aria-label="OpenStreetMap">© OpenStreetMap</a> <a class="mapbox-improve-map" href="https://apps.mapbox.com/feedback/?access_token=pk.eyJ1IjoiYWhtZWQ2ODQ5IiwiYSI6ImNtcDl1aXJjbTBpczAyc3NrYXVyaDdzeHcifQ.a7G0ZTgEg_ivd87WhjfXnQ#/90.6445/23.9517/8.62/40.8/59" target="_blank" aria-label="Improve this map" rel="noopener nofollow">Improve this map</a></div></div></div></div></div>
 
 <!-- Overlay to close dropdowns on outside tap -->
@@ -680,6 +681,24 @@
 
     <div class="menu-option switch-container" style="margin-top: 8px;">
         <span class="option-text" style="display:flex;align-items:center;gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+            OpenWeather 3D Temp
+        </span>
+        <label class="switch">
+            <input id="toggle-openweather-temp" type="checkbox">
+            <span class="slider-round"></span>
+        </label>
+    </div>
+    <div class="slider-container" id="openweather-opacity-container" style="opacity: 0.9; margin-top:6px;">
+        <div class="slider-label">
+            <span>Opacity</span>
+            <span id="openweather-opacity-val">80%</span>
+        </div>
+        <input id="slider-openweather" type="range" class="modern-range" min="0" max="100" value="80">
+    </div>
+
+    <div class="menu-option switch-container" style="margin-top: 8px;">
+        <span class="option-text" style="display:flex;align-items:center;gap:8px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
             Windy Temp Layer
         </span>
@@ -761,7 +780,7 @@
 <script>
     // ─── MAPBOX INITIALIZATION ───
     mapboxgl.accessToken = 'pk.eyJ1IjoiYWhtZWQ2ODQ5IiwiYSI6ImNtcDl1aXJjbTBpczAyc3NrYXVyaDdzeHcifQ.a7G0ZTgEg_ivd87WhjfXnQ';
-    const openWeatherApiKey = 'ac8dda2dbd7f0ec789d25f447eb170c8';
+    const openWeatherApiKey = '1d89e7d19c630976d58b431b77a4169e';
 
     var map = new mapboxgl.Map({
         container: 'map',
@@ -1125,6 +1144,52 @@
         document.getElementById('lst-opacity-val').innerText = e.target.value + '%';
         if (map.getLayer('world_lst_layer')) map.setPaintProperty('world_lst_layer', 'raster-opacity', parseInt(e.target.value) / 100);
     });
+
+    // OpenWeather opacity controls
+    const openweatherOpacityContainer = document.getElementById('openweather-opacity-container');
+    const openweatherSlider = document.getElementById('slider-openweather');
+    const openweatherOpacityVal = document.getElementById('openweather-opacity-val');
+    if (openweatherSlider) {
+        openweatherSlider.addEventListener('input', (e) => {
+            const raw = parseInt(e.target.value);
+            const v = raw / 100;
+            openweatherOpacityVal.innerText = raw + '%';
+            if (map.getLayer(openWeatherTempLayerId)) {
+                if (raw === 100) {
+                    map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', 1);
+                    map.setPaintProperty(openWeatherTempLayerId, 'raster-fade-duration', 0);
+                    try { map.moveLayer(openWeatherTempLayerId); } catch (err) {}
+                } else {
+                    map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', v);
+                    map.setPaintProperty(openWeatherTempLayerId, 'raster-fade-duration', 300);
+                }
+            }
+        });
+    }
+
+    // Show/hide slider when toggle changes
+    const owToggle = document.getElementById('toggle-openweather-temp');
+    if (owToggle) {
+        // initialize visibility
+        openweatherOpacityContainer.style.opacity = owToggle.checked ? '1' : '0.5';
+        openweatherOpacityContainer.style.pointerEvents = owToggle.checked ? 'auto' : 'none';
+        owToggle.addEventListener('change', (e) => {
+            const visible = e.target.checked;
+            openweatherOpacityContainer.style.opacity = visible ? '1' : '0.5';
+            openweatherOpacityContainer.style.pointerEvents = visible ? 'auto' : 'none';
+            // if turning on and layer exists, apply current slider value
+            if (visible) {
+                showOwOverlay(true);
+                if (map.getLayer(openWeatherTempLayerId)) {
+                    const v = parseInt(openweatherSlider.value) / 100;
+                    map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', v);
+                }
+            } else {
+                showOwOverlay(false);
+                if (map.getLayer(openWeatherTempLayerId)) map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'none');
+            }
+        });
+    }
 
     // ─── 3D/2D VIEW TOGGLE ───
     let is3DMode = false;
@@ -1634,6 +1699,9 @@
                     'layers': [{ 'id': 'osm-tiles-layer', 'type': 'raster', 'source': 'osm-tiles', 'minzoom': 0, 'maxzoom': 19 }]
                 });
             }
+            if (openWeatherTempEnabled) {
+                map.once('styledata', () => setOpenWeatherTempLayerVisibility(true));
+            }
             closeAll();
         });
     });
@@ -1687,6 +1755,141 @@
         if (geocoderEl) {
             geocoderEl.style.marginTop = '0';
         }
+    });
+
+    // ─── OPENWEATHER LIVE TEMPERATURE LAYER ───
+    const openWeatherTempSourceId = 'openweather-temp-source';
+    const openWeatherTempLayerId = 'openweather-temp-layer';
+    let openWeatherTempEnabled = false;
+
+    function ensureOpenWeatherTempLayer() {
+        if (map.getLayer(openWeatherTempLayerId)) return;
+
+        if (!map.getSource(openWeatherTempSourceId)) {
+            map.addSource(openWeatherTempSourceId, {
+                type: 'raster',
+                tiles: [`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherApiKey}`],
+                tileSize: 256,
+                attribution: '© OpenWeather'
+            });
+        }
+
+        const style = map.getStyle();
+        const fallbackLayer = style && Array.isArray(style.layers)
+            ? style.layers.find(layer => layer.id && ['waterway-label','water','water-label','road-label','building'].includes(layer.id))?.id
+            : null;
+
+        const layerConfig = {
+            id: openWeatherTempLayerId,
+            type: 'raster',
+            source: openWeatherTempSourceId,
+            minzoom: 0,
+            maxzoom: 19,
+            paint: {
+                'raster-opacity': 0.8
+            }
+        };
+
+        if (fallbackLayer) {
+            map.addLayer(layerConfig, fallbackLayer);
+        } else {
+            map.addLayer(layerConfig);
+        }
+
+        // Ensure the raster is rendered solid when requested: set zero fade and move to top
+        try {
+            map.setPaintProperty(openWeatherTempLayerId, 'raster-fade-duration', 0);
+            map.moveLayer(openWeatherTempLayerId);
+        } catch (e) {
+            console.warn('OpenWeather: moveLayer/fade-duration warning', e);
+        }
+    }
+
+    function setOpenWeatherTempLayerVisibility(visible) {
+        if (!map.isStyleLoaded()) {
+            map.once('load', () => setOpenWeatherTempLayerVisibility(visible));
+            return;
+        }
+
+        // If enabling, perform a quick tile access check to catch 401/permission errors
+        if (visible) {
+            checkOpenWeatherTileAccess().then(result => {
+                if (!result.ok) {
+                    // revert toggle and notify user
+                    const inp = document.getElementById('toggle-openweather-temp');
+                    if (inp) inp.checked = false;
+                    openWeatherTempEnabled = false;
+                    const msg = result.status ? `OpenWeather tile request failed (status ${result.status}). Please verify your API key and subscription to Weather Maps.` : `OpenWeather tile request failed: ${result.error || 'unknown error'}`;
+                    alert(msg);
+                    return;
+                }
+
+                ensureOpenWeatherTempLayer();
+                map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'visible');
+                // apply current slider opacity value if available
+                const sliderEl = document.getElementById('slider-openweather');
+                if (sliderEl && map.getLayer(openWeatherTempLayerId)) {
+                    const v = parseInt(sliderEl.value) / 100;
+                    map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', v);
+                }
+                openWeatherTempEnabled = true;
+            }).catch(err => {
+                const inp = document.getElementById('toggle-openweather-temp');
+                if (inp) inp.checked = false;
+                alert('OpenWeather tile check failed: ' + err.message);
+            });
+            return;
+        }
+
+        // disabling: simply hide the layer
+        if (map.getLayer(openWeatherTempLayerId)) {
+            map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'none');
+        }
+        openWeatherTempEnabled = false;
+    }
+
+    // Canvas-backed Leaflet overlay removed — using native Mapbox raster tiles on 3D globe instead
+
+    function showOwOverlay(show) {
+        if (show) {
+            ensureOpenWeatherTempLayer();
+            if (map.getLayer(openWeatherTempLayerId)) {
+                map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'visible');
+                const s = document.getElementById('slider-openweather');
+                if (s) {
+                    const v = parseInt(s.value) / 100;
+                    map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', v);
+                }
+            }
+            openWeatherTempEnabled = true;
+        } else {
+            if (map.getLayer(openWeatherTempLayerId)) {
+                map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'none');
+            }
+            openWeatherTempEnabled = false;
+        }
+    }
+
+    // Quick sample tile check to validate API key / subscription for OpenWeather tile service
+    async function checkOpenWeatherTileAccess() {
+        try {
+            const z = Math.max(2, Math.round(map.getZoom()));
+            const center = map.getCenter();
+            // convert lon/lat to tile x/y at zoom z
+            const xtile = Math.floor((center.lng + 180) / 360 * Math.pow(2, z));
+            const latRad = center.lat * Math.PI / 180;
+            const ytile = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, z));
+            const url = `https://tile.openweathermap.org/map/temp_new/${z}/${xtile}/${ytile}.png?appid=${openWeatherApiKey}`;
+            const r = await fetch(url, { method: 'GET' });
+            if (!r.ok) return { ok: false, status: r.status };
+            return { ok: true };
+        } catch (err) {
+            return { ok: false, error: err.message };
+        }
+    }
+
+    document.getElementById('toggle-openweather-temp').addEventListener('change', (e) => {
+        setOpenWeatherTempLayerVisibility(e.target.checked);
     });
 
     // ─── WINDY TEMPERATURE REALTIME LAYER INTEGRATION ───
