@@ -1796,11 +1796,8 @@
             });
         }
 
-        const style = map.getStyle();
-        const fallbackLayer = style && Array.isArray(style.layers)
-            ? style.layers.find(layer => layer.id && ['waterway-label','water','water-label','road-label','building'].includes(layer.id))?.id
-            : null;
-
+        // Build layer config — use slot:'bottom' so country borders & labels
+        // remain visible on top (exactly like Windy.com behaviour)
         const layerConfig = {
             id: openWeatherTempLayerId,
             type: 'raster',
@@ -1808,25 +1805,27 @@
             minzoom: 0,
             maxzoom: 19,
             paint: {
-                'raster-opacity': 0.85,
-                'raster-saturation': 0.6,
-                'raster-contrast': 0.3,
+                'raster-opacity': 0.82,
+                'raster-saturation': 1.4,   // vivid Windy-like colours
+                'raster-contrast': 0.45,     // stronger colour separation
                 'raster-fade-duration': 0
             }
         };
 
-        if (fallbackLayer) {
-            map.addLayer(layerConfig, fallbackLayer);
-        } else {
-            map.addLayer(layerConfig);
-        }
-
-        // Ensure the raster is rendered solid when requested: set zero fade and move to top
+        // Try Standard-style slot first (Mapbox GL v3+)
         try {
-            map.setPaintProperty(openWeatherTempLayerId, 'raster-fade-duration', 0);
-            map.moveLayer(openWeatherTempLayerId);
+            map.addLayer({ ...layerConfig, slot: 'bottom' });
         } catch (e) {
-            console.warn('OpenWeather: moveLayer/fade-duration warning', e);
+            // Fallback: insert before the first label/boundary layer found
+            const style = map.getStyle();
+            const beforeId = style && Array.isArray(style.layers)
+                ? style.layers.find(l => l.type === 'symbol' || (l.id && l.id.includes('label')))?.id
+                : null;
+            if (beforeId) {
+                map.addLayer(layerConfig, beforeId);
+            } else {
+                map.addLayer(layerConfig);
+            }
         }
     }
 
