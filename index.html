@@ -1787,18 +1787,19 @@
     function ensureOpenWeatherTempLayer() {
         if (map.getLayer(openWeatherTempLayerId)) return;
 
-        if (!map.getSource(openWeatherTempSourceId)) {
-            map.addSource(openWeatherTempSourceId, {
-                type: 'raster',
-                tiles: [`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherApiKey}`],
-                tileSize: 256,
-                attribution: '© OpenWeather'
-            });
+        // Remove stale source if it exists without a layer
+        if (map.getSource(openWeatherTempSourceId)) {
+            try { map.removeSource(openWeatherTempSourceId); } catch(e) {}
         }
 
-        // Build layer config — use slot:'bottom' so country borders & labels
-        // remain visible on top (exactly like Windy.com behaviour)
-        const layerConfig = {
+        map.addSource(openWeatherTempSourceId, {
+            type: 'raster',
+            tiles: [`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherApiKey}`],
+            tileSize: 256,
+            attribution: '© OpenWeather'
+        });
+
+        map.addLayer({
             id: openWeatherTempLayerId,
             type: 'raster',
             source: openWeatherTempSourceId,
@@ -1806,27 +1807,11 @@
             maxzoom: 19,
             paint: {
                 'raster-opacity': 0.82,
-                'raster-saturation': 1.4,   // vivid Windy-like colours
-                'raster-contrast': 0.45,     // stronger colour separation
+                'raster-saturation': 1.4,
+                'raster-contrast': 0.45,
                 'raster-fade-duration': 0
             }
-        };
-
-        // Try Standard-style slot first (Mapbox GL v3+)
-        try {
-            map.addLayer({ ...layerConfig, slot: 'bottom' });
-        } catch (e) {
-            // Fallback: insert before the first label/boundary layer found
-            const style = map.getStyle();
-            const beforeId = style && Array.isArray(style.layers)
-                ? style.layers.find(l => l.type === 'symbol' || (l.id && l.id.includes('label')))?.id
-                : null;
-            if (beforeId) {
-                map.addLayer(layerConfig, beforeId);
-            } else {
-                map.addLayer(layerConfig);
-            }
-        }
+        });
     }
 
     function setOpenWeatherTempLayerVisibility(visible) {
