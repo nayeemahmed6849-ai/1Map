@@ -1189,27 +1189,15 @@
         });
     }
 
-    // Show/hide slider when toggle changes
+    // Show/hide opacity container when toggle changes (UI only)
     const owToggle = document.getElementById('toggle-openweather-temp');
     if (owToggle) {
-        // initialize visibility
         openweatherOpacityContainer.style.opacity = owToggle.checked ? '1' : '0.5';
         openweatherOpacityContainer.style.pointerEvents = owToggle.checked ? 'auto' : 'none';
         owToggle.addEventListener('change', (e) => {
             const visible = e.target.checked;
             openweatherOpacityContainer.style.opacity = visible ? '1' : '0.5';
             openweatherOpacityContainer.style.pointerEvents = visible ? 'auto' : 'none';
-            // if turning on and layer exists, apply current slider value
-            if (visible) {
-                showOwOverlay(true);
-                if (map.getLayer(openWeatherTempLayerId)) {
-                    const v = parseInt(openweatherSlider.value) / 100;
-                    map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', v);
-                }
-            } else {
-                showOwOverlay(false);
-                if (map.getLayer(openWeatherTempLayerId)) map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'none');
-            }
         });
     }
 
@@ -1814,61 +1802,42 @@
         });
     }
 
-    function setOpenWeatherTempLayerVisibility(visible) {
-        if (!map.isStyleLoaded()) {
-            map.once('load', () => setOpenWeatherTempLayerVisibility(visible));
-            return;
-        }
+    // ─── OPENWEATHER TOGGLE: direct layer add/remove (no API pre-check) ───
+    document.getElementById('toggle-openweather-temp').addEventListener('change', (e) => {
+        const on = e.target.checked;
 
-        // If enabling, perform a quick tile access check to catch 401/permission errors
-        if (visible) {
-            checkOpenWeatherTileAccess().then(result => {
-                if (!result.ok) {
-                    // revert toggle and notify user
-                    const inp = document.getElementById('toggle-openweather-temp');
-                    if (inp) inp.checked = false;
-                    openWeatherTempEnabled = false;
-                    const msg = result.status ? `OpenWeather tile request failed (status ${result.status}). Please verify your API key and subscription to Weather Maps.` : `OpenWeather tile request failed: ${result.error || 'unknown error'}`;
-                    alert(msg);
-                    return;
-                }
-
-                ensureOpenWeatherTempLayer();
+        if (on) {
+            // Add source if not present
+            if (!map.getSource(openWeatherTempSourceId)) {
+                map.addSource(openWeatherTempSourceId, {
+                    type: 'raster',
+                    tiles: [`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherApiKey}`],
+                    tileSize: 256,
+                    attribution: '© OpenWeather'
+                });
+            }
+            // Add layer if not present, otherwise make visible
+            if (!map.getLayer(openWeatherTempLayerId)) {
+                map.addLayer({
+                    id: openWeatherTempLayerId,
+                    type: 'raster',
+                    source: openWeatherTempSourceId,
+                    minzoom: 0,
+                    maxzoom: 19,
+                    paint: {
+                        'raster-opacity': 0.82,
+                        'raster-saturation': 1.4,
+                        'raster-contrast': 0.45,
+                        'raster-fade-duration': 0
+                    }
+                });
+            } else {
                 map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'visible');
-                // apply current slider opacity value if available
-                const sliderEl = document.getElementById('slider-openweather');
-                if (sliderEl && map.getLayer(openWeatherTempLayerId)) {
-                    const v = parseInt(sliderEl.value) / 100;
-                    map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', v);
-                }
-                openWeatherTempEnabled = true;
-            }).catch(err => {
-                const inp = document.getElementById('toggle-openweather-temp');
-                if (inp) inp.checked = false;
-                alert('OpenWeather tile check failed: ' + err.message);
-            });
-            return;
-        }
-
-        // disabling: simply hide the layer
-        if (map.getLayer(openWeatherTempLayerId)) {
-            map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'none');
-        }
-        openWeatherTempEnabled = false;
-    }
-
-    // Canvas-backed Leaflet overlay removed — using native Mapbox raster tiles on 3D globe instead
-
-    function showOwOverlay(show) {
-        if (show) {
-            ensureOpenWeatherTempLayer();
-            if (map.getLayer(openWeatherTempLayerId)) {
-                map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'visible');
-                const s = document.getElementById('slider-openweather');
-                if (s) {
-                    const v = parseInt(s.value) / 100;
-                    map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', v);
-                }
+            }
+            // Apply current slider opacity
+            const sliderEl = document.getElementById('slider-openweather');
+            if (sliderEl && map.getLayer(openWeatherTempLayerId)) {
+                map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', parseInt(sliderEl.value) / 100);
             }
             openWeatherTempEnabled = true;
         } else {
@@ -1877,28 +1846,6 @@
             }
             openWeatherTempEnabled = false;
         }
-    }
-
-    // Quick sample tile check to validate API key / subscription for OpenWeather tile service
-    async function checkOpenWeatherTileAccess() {
-        try {
-            const z = Math.max(2, Math.round(map.getZoom()));
-            const center = map.getCenter();
-            // convert lon/lat to tile x/y at zoom z
-            const xtile = Math.floor((center.lng + 180) / 360 * Math.pow(2, z));
-            const latRad = center.lat * Math.PI / 180;
-            const ytile = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, z));
-            const url = `https://tile.openweathermap.org/map/temp_new/${z}/${xtile}/${ytile}.png?appid=${openWeatherApiKey}`;
-            const r = await fetch(url, { method: 'GET' });
-            if (!r.ok) return { ok: false, status: r.status };
-            return { ok: true };
-        } catch (err) {
-            return { ok: false, error: err.message };
-        }
-    }
-
-    document.getElementById('toggle-openweather-temp').addEventListener('change', (e) => {
-        setOpenWeatherTempLayerVisibility(e.target.checked);
     });
 
     // ─── WINDY TEMPERATURE REALTIME LAYER INTEGRATION ───
