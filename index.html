@@ -1769,45 +1769,15 @@
 
     // ─── OPENWEATHER LIVE TEMPERATURE LAYER ───
     const openWeatherTempSourceId = 'openweather-temp-source';
-    const openWeatherTempLayerId = 'openweather-temp-layer';
+    const openWeatherTempLayerId  = 'openweather-temp-layer';
     let openWeatherTempEnabled = false;
 
-    function ensureOpenWeatherTempLayer() {
-        if (map.getLayer(openWeatherTempLayerId)) return;
-
-        // Remove stale source if it exists without a layer
-        if (map.getSource(openWeatherTempSourceId)) {
-            try { map.removeSource(openWeatherTempSourceId); } catch(e) {}
-        }
-
-        map.addSource(openWeatherTempSourceId, {
-            type: 'raster',
-            tiles: [`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherApiKey}`],
-            tileSize: 256,
-            attribution: '© OpenWeather'
-        });
-
-        map.addLayer({
-            id: openWeatherTempLayerId,
-            type: 'raster',
-            source: openWeatherTempSourceId,
-            minzoom: 0,
-            maxzoom: 19,
-            paint: {
-                'raster-opacity': 0.82,
-                'raster-saturation': 1.4,
-                'raster-contrast': 0.45,
-                'raster-fade-duration': 0
+    function addOpenWeatherLayer() {
+        try {
+            // Remove stale source (exists without a paired layer)
+            if (map.getSource(openWeatherTempSourceId) && !map.getLayer(openWeatherTempLayerId)) {
+                map.removeSource(openWeatherTempSourceId);
             }
-        });
-    }
-
-    // ─── OPENWEATHER TOGGLE: direct layer add/remove (no API pre-check) ───
-    document.getElementById('toggle-openweather-temp').addEventListener('change', (e) => {
-        const on = e.target.checked;
-
-        if (on) {
-            // Add source if not present
             if (!map.getSource(openWeatherTempSourceId)) {
                 map.addSource(openWeatherTempSourceId, {
                     type: 'raster',
@@ -1816,7 +1786,6 @@
                     attribution: '© OpenWeather'
                 });
             }
-            // Add layer if not present, otherwise make visible
             if (!map.getLayer(openWeatherTempLayerId)) {
                 map.addLayer({
                     id: openWeatherTempLayerId,
@@ -1834,17 +1803,38 @@
             } else {
                 map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'visible');
             }
-            // Apply current slider opacity
-            const sliderEl = document.getElementById('slider-openweather');
-            if (sliderEl && map.getLayer(openWeatherTempLayerId)) {
-                map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', parseInt(sliderEl.value) / 100);
+            // Apply slider opacity
+            const s = document.getElementById('slider-openweather');
+            if (s && map.getLayer(openWeatherTempLayerId)) {
+                map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', parseInt(s.value) / 100);
             }
             openWeatherTempEnabled = true;
+        } catch(err) {
+            console.error('OpenWeather layer error:', err);
+        }
+    }
+
+    document.getElementById('toggle-openweather-temp').addEventListener('change', (e) => {
+        const on = e.target.checked;
+        if (on) {
+            // Wait for style to be ready before adding layers
+            if (map.isStyleLoaded()) {
+                addOpenWeatherLayer();
+            } else {
+                map.once('style.load', addOpenWeatherLayer);
+            }
         } else {
             if (map.getLayer(openWeatherTempLayerId)) {
                 map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'none');
             }
             openWeatherTempEnabled = false;
+        }
+    });
+
+    // Re-add layer after style change if it was enabled
+    map.on('style.load', () => {
+        if (openWeatherTempEnabled) {
+            addOpenWeatherLayer();
         }
     });
 
