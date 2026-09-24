@@ -1787,20 +1787,26 @@
                 });
             }
             if (!map.getLayer(openWeatherTempLayerId)) {
-                map.addLayer({
+                // Use slot:'middle' → temperature goes below country boundaries & labels
+                const layerDef = {
                     id: openWeatherTempLayerId,
                     type: 'raster',
                     source: openWeatherTempSourceId,
                     minzoom: 0,
                     maxzoom: 19,
                     paint: {
-                        'raster-opacity': 0.9,
-                        'raster-saturation': 1.0,
-                        'raster-contrast': 0.9,
-                        'raster-brightness-min': 0.05,
+                        'raster-opacity': 0.75,
+                        'raster-saturation': 0.3,
+                        'raster-contrast': 0.25,
                         'raster-fade-duration': 0
                     }
-                });
+                };
+                try {
+                    // Standard style slot keeps boundaries on top
+                    map.addLayer({ ...layerDef, slot: 'middle' });
+                } catch(e) {
+                    map.addLayer(layerDef);
+                }
             } else {
                 map.setLayoutProperty(openWeatherTempLayerId, 'visibility', 'visible');
             }
