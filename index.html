@@ -695,6 +695,14 @@
             <span id="openweather-opacity-val">80%</span>
         </div>
         <input id="slider-openweather" type="range" class="modern-range" min="0" max="100" value="80">
+        
+        <!-- NEW Color Intensity Slider -->
+        <div class="slider-label" style="margin-top: 10px;">
+            <span>Color Intensity</span>
+            <span id="openweather-intensity-val">30%</span>
+        </div>
+        <input id="slider-openweather-intensity" type="range" class="modern-range" min="0" max="100" value="30">
+        
         <!-- Temperature color legend -->
         <div style="margin-top:7px;">
             <div style="height:10px;border-radius:5px;background:linear-gradient(to right,
@@ -728,14 +736,6 @@
             <input id="toggle-windy" type="checkbox">
             <span class="slider-round"></span>
         </label>
-    </div>
-    
-    <div class="slider-container" id="windy-opacity-container" style="opacity: 0.5; pointer-events: none;">
-        <div class="slider-label">
-            <span>Opacity</span>
-            <span id="windy-opacity-val">80%</span>
-        </div>
-        <input id="slider-windy" type="range" class="modern-range" min="0" max="100" value="80">
     </div>
 
     <div class="menu-divider"></div>
@@ -1175,10 +1175,13 @@
         if (map.getLayer('world_lst_layer')) map.setPaintProperty('world_lst_layer', 'raster-opacity', parseInt(e.target.value) / 100);
     });
 
-    // OpenWeather opacity controls
+    // OpenWeather opacity and intensity controls
     const openweatherOpacityContainer = document.getElementById('openweather-opacity-container');
     const openweatherSlider = document.getElementById('slider-openweather');
     const openweatherOpacityVal = document.getElementById('openweather-opacity-val');
+    const openweatherIntensitySlider = document.getElementById('slider-openweather-intensity');
+    const openweatherIntensityVal = document.getElementById('openweather-intensity-val');
+    
     if (openweatherSlider) {
         openweatherSlider.addEventListener('input', (e) => {
             const raw = parseInt(e.target.value);
@@ -1193,6 +1196,22 @@
                     map.setPaintProperty(openWeatherTempLayerId, 'raster-opacity', v);
                     map.setPaintProperty(openWeatherTempLayerId, 'raster-fade-duration', 300);
                 }
+            }
+        });
+    }
+
+    if (openweatherIntensitySlider) {
+        openweatherIntensitySlider.addEventListener('input', (e) => {
+            const raw = parseInt(e.target.value);
+            openweatherIntensityVal.innerText = raw + '%';
+            if (map.getLayer(openWeatherTempLayerId)) {
+                // Map 0-100 to saturation (0 to 1) and contrast (0 to 1)
+                const saturation = raw / 100;
+                // Keep contrast slightly lower than saturation to avoid blown out colors, but map up to 0.9 max
+                const contrast = (raw / 100) * 0.9;
+                
+                map.setPaintProperty(openWeatherTempLayerId, 'raster-saturation', saturation);
+                map.setPaintProperty(openWeatherTempLayerId, 'raster-contrast', contrast);
             }
         });
     }
@@ -1795,6 +1814,16 @@
                 });
             }
             if (!map.getLayer(openWeatherTempLayerId)) {
+                // Read current intensity slider value if available
+                let startSaturation = 0.3;
+                let startContrast = 0.25;
+                const intSlider = document.getElementById('slider-openweather-intensity');
+                if (intSlider) {
+                    const intVal = parseInt(intSlider.value);
+                    startSaturation = intVal / 100;
+                    startContrast = (intVal / 100) * 0.9;
+                }
+                
                 // Use slot:'middle' → temperature goes below country boundaries & labels
                 const layerDef = {
                     id: openWeatherTempLayerId,
@@ -1804,8 +1833,8 @@
                     maxzoom: 19,
                     paint: {
                         'raster-opacity': 0.85,
-                        'raster-saturation': 0.3,
-                        'raster-contrast': 0.25,
+                        'raster-saturation': startSaturation,
+                        'raster-contrast': startContrast,
                         'raster-fade-duration': 0
                     }
                 };
@@ -1940,31 +1969,9 @@
     }
 
     // Toggle logic for Windy Temperature Layer
-    const windyToggle = document.getElementById('toggle-windy');
-    const windyOpacityContainer = document.getElementById('windy-opacity-container');
-    const windySlider = document.getElementById('slider-windy');
-    const windyOpacityVal = document.getElementById('windy-opacity-val');
-    
-    if (windySlider) {
-        windySlider.addEventListener('input', (e) => {
-            const raw = parseInt(e.target.value);
-            windyOpacityVal.innerText = raw + '%';
-            const windyContainer = document.getElementById('windy-container');
-            if (windyContainer) {
-                windyContainer.style.opacity = raw / 100;
-            }
-        });
-    }
-
-    windyToggle.addEventListener('change', (e) => {
+    document.getElementById('toggle-windy').addEventListener('change', (e) => {
         const isChecked = e.target.checked;
         const windyContainer = document.getElementById('windy-container');
-        
-        // Show/hide opacity container
-        if (windyOpacityContainer) {
-            windyOpacityContainer.style.opacity = isChecked ? '1' : '0.5';
-            windyOpacityContainer.style.pointerEvents = isChecked ? 'auto' : 'none';
-        }
         
         if (isChecked) {
             // Transition Mapbox to a flat 2D perspective (pitch 0, bearing 0) to align with Leaflet
@@ -1977,11 +1984,6 @@
             // Show the Windy div and set pointer-events to let users interact with the Leaflet overlay
             windyContainer.style.display = 'block';
             windyContainer.style.pointerEvents = 'auto';
-            
-            // Apply current slider opacity
-            if (windySlider) {
-                windyContainer.style.opacity = parseInt(windySlider.value) / 100;
-            }
             
             // Boot the map once the container is visible
             initWindyMap();
