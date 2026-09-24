@@ -729,6 +729,14 @@
             <span class="slider-round"></span>
         </label>
     </div>
+    
+    <div class="slider-container" id="windy-opacity-container" style="opacity: 0.5; pointer-events: none;">
+        <div class="slider-label">
+            <span>Opacity</span>
+            <span id="windy-opacity-val">80%</span>
+        </div>
+        <input id="slider-windy" type="range" class="modern-range" min="0" max="100" value="80">
+    </div>
 
     <div class="menu-divider"></div>
     <div class="menu-title">Navigation</div>
@@ -1932,9 +1940,31 @@
     }
 
     // Toggle logic for Windy Temperature Layer
-    document.getElementById('toggle-windy').addEventListener('change', (e) => {
+    const windyToggle = document.getElementById('toggle-windy');
+    const windyOpacityContainer = document.getElementById('windy-opacity-container');
+    const windySlider = document.getElementById('slider-windy');
+    const windyOpacityVal = document.getElementById('windy-opacity-val');
+    
+    if (windySlider) {
+        windySlider.addEventListener('input', (e) => {
+            const raw = parseInt(e.target.value);
+            windyOpacityVal.innerText = raw + '%';
+            const windyContainer = document.getElementById('windy-container');
+            if (windyContainer) {
+                windyContainer.style.opacity = raw / 100;
+            }
+        });
+    }
+
+    windyToggle.addEventListener('change', (e) => {
         const isChecked = e.target.checked;
         const windyContainer = document.getElementById('windy-container');
+        
+        // Show/hide opacity container
+        if (windyOpacityContainer) {
+            windyOpacityContainer.style.opacity = isChecked ? '1' : '0.5';
+            windyOpacityContainer.style.pointerEvents = isChecked ? 'auto' : 'none';
+        }
         
         if (isChecked) {
             // Transition Mapbox to a flat 2D perspective (pitch 0, bearing 0) to align with Leaflet
@@ -1947,6 +1977,11 @@
             // Show the Windy div and set pointer-events to let users interact with the Leaflet overlay
             windyContainer.style.display = 'block';
             windyContainer.style.pointerEvents = 'auto';
+            
+            // Apply current slider opacity
+            if (windySlider) {
+                windyContainer.style.opacity = parseInt(windySlider.value) / 100;
+            }
             
             // Boot the map once the container is visible
             initWindyMap();
